@@ -1,30 +1,50 @@
 import streamlit as st
 import requests
 
-st.title("🍬 Анализ отзывов Orbit")
-st.write("Определение тональности отзыва с помощью ML-модели.")
+# Настройка страницы Streamlit
+st.set_page_config(page_title="Orbit Reviews", page_icon="🍬")
 
-# Полностью пустое поле ввода без какого-либо текста
-review_text = st.text_area("Введите отзыв об Orbit:", value="")
+st.title("🍬 Orbit Reviews — Анализ отзывов")
+st.write("Связка Streamlit + FastAPI. Введите отзыв на жвачку Orbit, и модель определит его тональность.")
 
-if st.button("Проверить отзыв"):
-    if not review_text.strip():
-        st.warning("Пожалуйста, введите текст отзыва.")
-    else:
-        try:
-            # Отправляем запрос на наш сервер FastAPI
-            response = requests.post(
-                "http://127.0.0.1:8000/predict",
-                json={"text": review_text}
-            )
-            
-            if response.status_code == 200:
-                result = response.json()["sentiment"]
-                if result == "Положительный":
-                    st.success(f"Результат: {result} 👍")
+# Поле для ввода текста
+user_input = st.text_area(
+    "Ваш отзыв:", 
+    placeholder="Например: Отличная жвачка, вкус держится очень долго, рекомендую!"
+)
+
+# Кнопка отправки
+if st.button("Определить тональность"):
+    if user_input.strip():
+        with st.spinner("Запрос к FastAPI серверу..."):
+            try:
+                # Отправляем POST-запрос на локальный FastAPI (порт 8000)
+                # Когда будете деплоить на Streamlit Cloud / HuggingFace, 
+                # этот URL можно будет поменять на адрес вашего веб-сервера.
+                response = requests.post(
+                    "http://127.0.0", 
+                    json={"text": user_input}
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    
+                    if "error" in result:
+                        st.error(f"Ошибка бэкенда: {result['error']}")
+                    else:
+                        sentiment = result["sentiment"]
+                        
+                        # Красивый вывод результата
+                        if sentiment == "positive":
+                            st.success("🎉 **Положительный отзыв!** Модели Orbit понравился ваш отзыв.")
+                        elif sentiment == "negative":
+                            st.error("😡 **Отрицательный отзыв!** Модель считает, что отзыв содержит критику.")
+                        else:
+                            st.info(f"🤖 **Результат модели:** {sentiment}")
                 else:
-                    st.error(f"Результат: {result} 👎")
-            else:
-                st.error("Ошибка при обработке запроса сервером.")
-        except Exception:
-            st.error("Сервер FastAPI не запущен. Запустите сначала бэкенд.")
+                    st.error(f"Ошибка сервера API. Статус-код: {response.status_code}")
+                    
+            except requests.exceptions.ConnectionError:
+                st.error("❌ Не удалось связаться с FastAPI сервером. Убедитесь, что бэкенд (main.py) запущен на порту 8000.")
+    else:
+        st.warning("Пожалуйста, введите хоть какой-нибудь текст отзыва.")
