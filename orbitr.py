@@ -80,3 +80,26 @@ with col2:
             with d_col2:
                 st.error("🔴 На что жалуются:")
                 for m in res["hate"]: st.write(f"- {m}")
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+api_app = FastAPI(title="Orbitr Review Analyzer API")
+
+class ReviewInput(BaseModel):
+    text: str
+
+@api_app.post("/predict")
+def predict_sentiment(data: ReviewInput):
+    """Эндпоинт FastAPI для анализа тональности текста через API"""
+    # Базовая заглушка для демонстрации работы API
+    text_lower = data.text.lower()
+    if "отличн" in text_lower or "хорош" in text_lower or "понрав" in text_lower:
+        sentiment = "Позитивный"
+    elif "плох" in text_lower or "ужас" in text_lower or "не понрав" in text_lower:
+        sentiment = "Негативный"
+    else:
+        sentiment = "Нейтральный"
+
+    return {"status": "success", "review": data.text, "sentiment": sentiment}
+
