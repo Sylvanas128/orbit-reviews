@@ -1,26 +1,40 @@
 import streamlit as st
 import requests
+import subprocess
+import time
 
-# Настройка страницы Streamlit
+# 🚀 АВТОЗАПУСК FASTAPI В ФОНЕ (для работы на сервере Streamlit Cloud)
+@st.cache_resource
+def start_fastapi():
+    # Запускаем uvicorn на локальном порту 8000 внутри контейнера Streamlit
+    process = subprocess.Popen(
+        ["uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    # Даем серверу 3 секунды, чтобы проснуться и загрузить модель model.pkl
+    time.sleep(3)
+    return process
+
+# Запускаем бэкенд
+start_fastapi()
+
+# 🍬 НАСТРОЙКА ИНТЕРФЕЙСА STREAMLIT
 st.set_page_config(page_title="Orbit Reviews", page_icon="🍬")
 
 st.title("🍬 Orbit Reviews — Анализ отзывов")
-st.write("Связка Streamlit + FastAPI. Введите отзыв на жвачку Orbit, и модель определит его тональность.")
+st.write("Полноценная связка Streamlit + FastAPI. Введите отзыв на жвачку Orbit, и модель определит его тональность.")
 
-# Поле для ввода текста
 user_input = st.text_area(
     "Ваш отзыв:", 
     placeholder="Например: Отличная жвачка, вкус держится очень долго, рекомендую!"
 )
 
-# Кнопка отправки
 if st.button("Определить тональность"):
     if user_input.strip():
-        with st.spinner("Запрос к FastAPI серверу..."):
+        with st.spinner("Запрос к фоновому FastAPI серверу..."):
             try:
-                # Отправляем POST-запрос на локальный FastAPI (порт 8000)
-                # Когда будете деплоить на Streamlit Cloud / HuggingFace, 
-                # этот URL можно будет поменять на адрес вашего веб-сервера.
+                # Так как они запущены в одном контейнере, запрос идет на 127.0.0.1:8000
                 response = requests.post(
                     "http://127.0.0", 
                     json={"text": user_input}
@@ -34,7 +48,6 @@ if st.button("Определить тональность"):
                     else:
                         sentiment = result["sentiment"]
                         
-                        # Красивый вывод результата
                         if sentiment == "positive":
                             st.success("🎉 **Положительный отзыв!** Модели Orbit понравился ваш отзыв.")
                         elif sentiment == "negative":
@@ -45,6 +58,6 @@ if st.button("Определить тональность"):
                     st.error(f"Ошибка сервера API. Статус-код: {response.status_code}")
                     
             except requests.exceptions.ConnectionError:
-                st.error("❌ Не удалось связаться с FastAPI сервером. Убедитесь, что бэкенд (main.py) запущен на порту 8000.")
+                st.error("❌ Не удалось связаться с внутренним FastAPI. Попробуйте обновить страницу.")
     else:
         st.warning("Пожалуйста, введите хоть какой-нибудь текст отзыва.")
