@@ -5,8 +5,8 @@
 Система классифицирует входящий текст на положительный или отрицательный, помогая автоматизировать модерацию и анализировать обратную связь от клиентов.
 
 ## 🚀 Демонстрация работы проекта
-* **🌍 Веб-интерфейс приложения:** [orbit-reviews.streamlit.app](https://orbit-reviews.streamlit.app/)
-* **📊 Блокнот обучения модели:** [![Open In Colab](https://google.com)](https://google.com)
+* **🌍 Веб-интерфейс приложения:** [orbit-reviews.streamlit.app](https://orbit-reviews.streamlit.app)
+* **📊 Блокнот обучения модели:** [![Open In Colab](https://google.com)](https://colab.research.google.com/github/Sylvanas128/orbit-reviews/blob/main/orbit_model.ipynb)
 
 ## 🛠 Стек технологий
 
