@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 
 # Создаем приложение FastAPI
-app = FastAPI(title="Orbit Reviews API", description="API для определения тональности отзывов")
+
+app = FastAPI(title="Orbit Reviews API", description="API для определения тональности отзывов на товары и услуги")
 
 # Загружаем вашу модель один раз при старте сервера
 try:
