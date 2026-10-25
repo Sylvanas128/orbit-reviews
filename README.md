@@ -4,35 +4,36 @@
 
 Система классифицирует входящий текст на положительный или отрицательный, помогая автоматизировать модерацию и анализировать обратную связь от клиентов.
 
-[![Open In Colab](https://google.com)](https://google.com)
-
-👉 **[Открыть блокнот модели в Google Colab](https://google.com)**
+## 🚀 Демонстрация работы проекта
+* **🌍 Веб-интерфейс приложения:** [orbit-reviews.streamlit.app](https://streamlit.app)
+* **📊 Блокнот обучения модели:** [![Open In Colab](https://colab.research.google.com/github/Sylvanas128/orbit-reviews/blob/main/orbit_model.ipynb#scrollTo=vAE7LgixctSO)]([https://google.com](https://colab.research.google.com/github/Sylvanas128/orbit-reviews/blob/main/orbit_model.ipynb#scrollTo=vAE7LgixctSO))
 
 ## 🛠 Стек технологий
 
 * **ML / Data:** Python, Scikit-learn, TF-IDF, Logistic Regression, Joblib
-* **Backend:** FastAPI, Uvicorn, Pydantic
+* **Backend:** FastAPI, Pydantic, TestClient
 * **Frontend:** Streamlit
 * **Тестирование:** Pytest
 
-## 🚀 Локальный запуск проекта
+## 🚀 Архитектурная особенность
+Проект спроектирован по классической схеме разделения обязанностей (Separation of Concerns):
+1. **Бэкенд (`main.py`)**: Реализован на FastAPI, отвечает за валидацию входных данных через Pydantic-схемы и запуск инференса модели машинного обучения.
+2. **Фронтенд (`streamlit_app.py`)**: Реализован на Streamlit, предоставляет пользователю удобный интерфейс для ввода отзывов. 
+3. **Интеграция в Production**: Для деплоя в облачную среду Streamlit Cloud бэкенд FastAPI интегрирован в процесс веб-интерфейса с помощью `fastapi.testclient.TestClient`. Это обеспечивает полную изоляцию и автономность бэкенд-логики без необходимости использования внешних открытых сетевых портов.
+
+## 🛠 Локальный запуск проекта (для проверки)
 
 1. Установите зависимости:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Запустите бэкенд (FastAPI сервер):
-```bash
-uvicorn main:app --reload --port 8000
-```
-
-3. В другом терминале запустите фронтенд (Streamlit интерфейс):
+2. Запустите веб-приложение:
 ```bash
 streamlit run streamlit_app.py
 ```
 
-4. Запуск автоматических тестов:
+3. Запуск автоматических тестов бэкенда:
 ```bash
 pytest test_main.py -v
 ```
